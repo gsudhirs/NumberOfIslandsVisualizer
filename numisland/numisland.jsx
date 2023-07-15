@@ -60,7 +60,7 @@ export default class numisland extends Component {
         console.log(islands);
     }
 
-    dfs = (row, col) => {
+    dfs(row, col){
         var grid = this.state.grid;
         var visited = this.state.visited;
         if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS ) {
@@ -82,6 +82,9 @@ export default class numisland extends Component {
             <div>
                 <button onClick={() => this.visualizeIslands()}>
                     Start!
+                </button>
+                <button onClick={() => this.setState({grid: getInitGrid()})}>
+                    Clear grid!
                 </button>
                 <div className="grid">
                     {grid.map((row, rowIdx) => {
@@ -137,7 +140,7 @@ const getInitVisited = () => {
     return grid;
   };
 
-  const createNode = (row, col) => {
+const createNode = (row, col) => {
     return {
       row,
       col,
@@ -145,9 +148,9 @@ const getInitVisited = () => {
       isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
       isIsland: false,
     };
-  };
+};
 
-  const getNewGridWithIsland = (grid, row, col) => {
+const getNewGridWithIsland = (grid, row, col) => {
     const newGrid = grid.slice();
     const node = newGrid[row][col];
     const newNode = {
@@ -156,4 +159,4 @@ const getInitVisited = () => {
     };
     newGrid[row][col] = newNode;
     return newGrid;
-  };
+};
