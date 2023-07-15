@@ -15,14 +15,17 @@ export default class numisland extends Component {
         super();
         this.state = {
             grid: [],
+            visited: [],
             mouseIsPressed: false,
             islands: 0,
         };
+        this.dfs=this.dfs.bind(this);
     }
 
     componentDidMount() {
         const grid = getInitGrid();
-        this.setState({grid});
+        const visited = getInitVisited();
+        this.setState({grid, visited});
     }
 
     handleMouseDown(row, col) {
@@ -41,8 +44,38 @@ export default class numisland extends Component {
     }
 
     visualizeIslands() {
+        var grid = this.state.grid;
+        var islands = this.state.islands;
+        var visited = this.state.visited;
+        for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+                const {row, col, isStart, isFinish, isIsland} = grid[r][c];
+                if (isIsland && !visited[r][c]) {
+                    this.dfs(r, c);
+                    islands++;
+                }
+            }
+        }
+        this.setState({visited: getInitVisited()})
+        console.log(islands);
     }
-    
+
+    dfs = (row, col) => {
+        var grid = this.state.grid;
+        var visited = this.state.visited;
+        if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS ) {
+            return;
+        }
+        const {isIsland} = grid[row][col];
+        if (!isIsland || visited[row][col])
+            return;
+        visited[row][col] = true;
+        this.dfs(row-1, col);
+        this.dfs(row+1, col);
+        this.dfs(row, col-1);
+        this.dfs(row, col+1);
+    }
+
     render() {
         const {grid, mouseIsPressed} = this.state;
         return (
@@ -86,6 +119,18 @@ const getInitGrid = () => {
       const currentRow = [];
       for (let col = 0; col < GRID_COLS; col++) {
         currentRow.push(createNode(row, col));
+      }
+      grid.push(currentRow);
+    }
+    return grid;
+};
+
+const getInitVisited = () => {
+    const grid = [];
+    for (let row = 0; row < GRID_ROWS; row++) {
+      const currentRow = [];
+      for (let col = 0; col < GRID_COLS; col++) {
+        currentRow.push(false);
       }
       grid.push(currentRow);
     }
