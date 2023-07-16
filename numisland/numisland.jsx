@@ -18,6 +18,7 @@ export default class numisland extends Component {
             visited: [],
             mouseIsPressed: false,
             islands: 0,
+            orderVisited: [],
         };
         this.dfs=this.dfs.bind(this);
     }
@@ -43,26 +44,47 @@ export default class numisland extends Component {
         this.setState({mouseIsPressed: false});
     }
 
+    animateDFS() {
+        var orderVisited = this.state.orderVisited;
+        for (let i = 0; i < orderVisited.length; i++) {
+            setTimeout(() => {
+                const node = orderVisited[i];
+                document.getElementById(`node-${node.row}-${node.col}`).className =
+                  'node node-visited';
+            }, 10 * i);
+        }
+    }
+
     visualizeIslands() {
         var grid = this.state.grid;
         var islands = this.state.islands;
         var visited = this.state.visited;
+        var orderVisited = this.state.orderVisited;
         for (let r = 0; r < GRID_ROWS; r++) {
             for (let c = 0; c < GRID_COLS; c++) {
-                const {row, col, isStart, isFinish, isIsland} = grid[r][c];
+                const {isIsland} = grid[r][c];
                 if (isIsland && !visited[r][c]) {
                     this.dfs(r, c);
                     islands++;
                 }
+                else {
+                    if (visited[r][c])
+                        continue;
+                    orderVisited.push(grid[r][c]);
+                    this.setState({orderVisited: orderVisited, orderVisited: []});
+                }
             }
         }
-        this.setState({visited: getInitVisited()})
         console.log(islands);
+        console.log(orderVisited);
+        this.animateDFS();
+        this.setState({visited: getInitVisited()});
     }
 
     dfs(row, col){
         var grid = this.state.grid;
         var visited = this.state.visited;
+        var orderVisited = this.state.orderVisited;
         if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS ) {
             return;
         }
@@ -70,6 +92,8 @@ export default class numisland extends Component {
         if (!isIsland || visited[row][col])
             return;
         visited[row][col] = true;
+        orderVisited.push(grid[row][col]);
+        this.setState({orderVisited: orderVisited});
         this.dfs(row-1, col);
         this.dfs(row+1, col);
         this.dfs(row, col-1);
