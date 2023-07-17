@@ -10,15 +10,19 @@ const FINISH_NODE_COL = 49;
 const GRID_ROWS = 20;
 const GRID_COLS = 50;
 
+/**
+ * This class visualizes the Number of Islands LeetCode problem
+ * @author Gahan Sudhir
+ */
 export default class numisland extends Component {
     constructor() {
         super();
         this.state = {
-            grid: [],
-            visited: [],
-            mouseIsPressed: false,
-            islands: 0,
-            orderVisited: [],
+            grid: [],                       // grid of cells that represents islands & water
+            visited: [],                    // 2D array representing whether search reached cell at i,j
+            mouseIsPressed: false,          
+            islands: 0,                     // current # of islands detected
+            orderVisited: [],               // order of cells visited by search
         };
         this.dfs=this.dfs.bind(this);
     }
@@ -29,21 +33,38 @@ export default class numisland extends Component {
         this.setState({grid, visited});
     }
 
+    /**
+     * toggle isIsland for cell at r,c
+     * @param {*} row 
+     * @param {*} col 
+     */
     handleMouseDown(row, col) {
         const newGrid = getNewGridWithIsland(this.state.grid, row, col);
         this.setState({grid: newGrid, mouseIsPressed: true});
     }
     
+    /**
+     * toggle isIsland for cell at r,c
+     * @param {*} row 
+     * @param {*} col 
+     * @returns 
+     */
     handleMouseEnter(row, col) {
         if (!this.state.mouseIsPressed) return;
         const newGrid = getNewGridWithIsland(this.state.grid, row, col);
         this.setState({grid: newGrid});
     }
     
+    /**
+     * set mouse to not pressed
+     */
     handleMouseUp() {
         this.setState({mouseIsPressed: false});
     }
 
+    /**
+     * animates path taken by the algorithm and discerns islands vs water
+     */
     animateDFS() {
         var orderVisited = this.state.orderVisited;
         var islands = this.state.islands;
@@ -70,6 +91,9 @@ export default class numisland extends Component {
         }
     }
 
+    /**
+     * explores the grid and DFS on the first unvisited cell thats an island
+     */
     visualizeIslands() {
         var grid = this.state.grid;
         var islands = this.state.islands;
@@ -79,8 +103,6 @@ export default class numisland extends Component {
             for (let c = 0; c < GRID_COLS; c++) {
                 const {isIsland} = grid[r][c];
                 if (isIsland && !visited[r][c]) {
-                    //islands++;
-                    //this.setState({islands: islands});
                     this.dfs(r, c);
                 }
                 else {
@@ -91,11 +113,15 @@ export default class numisland extends Component {
                 }
             }
         }
-        console.log(islands);
-        console.log(orderVisited);
         this.animateDFS();
     }
 
+    /**
+     * helper method to dfs and detect a single island
+     * @param {*} row 
+     * @param {*} col 
+     * @returns 
+     */
     dfs(row, col){
         var grid = this.state.grid;
         var visited = this.state.visited;
@@ -115,6 +141,9 @@ export default class numisland extends Component {
         this.dfs(row, col+1);
     }
 
+    /**
+     * clears all islands on the board
+     */
     clearBoard() {
         var orderVisited = this.state.orderVisited;
         for (let i = 0; i < orderVisited.length; i++) {
@@ -172,6 +201,10 @@ export default class numisland extends Component {
     }
 }
 
+/**
+ * returns new grid of tuples w info of cell
+ * @returns grid
+ */
 const getInitGrid = () => {
     const grid = [];
     for (let row = 0; row < GRID_ROWS; row++) {
@@ -184,6 +217,10 @@ const getInitGrid = () => {
     return grid;
 };
 
+/**
+ * returns visited bool array to inform whether cell at i,j is visited
+ * @returns 2d boolean visited arr
+ */
 const getInitVisited = () => {
     const grid = [];
     for (let row = 0; row < GRID_ROWS; row++) {
@@ -194,8 +231,14 @@ const getInitVisited = () => {
       grid.push(currentRow);
     }
     return grid;
-  };
+};
 
+/**
+ * creates a tuple of Node info
+ * @param {*} row 
+ * @param {*} col 
+ * @returns 
+ */
 const createNode = (row, col) => {
     return {
       row,
@@ -206,6 +249,13 @@ const createNode = (row, col) => {
     };
 };
 
+/**
+ * marks a cell on the grid as an island 
+ * @param {*} grid 
+ * @param {*} row 
+ * @param {*} col 
+ * @returns 
+ */
 const getNewGridWithIsland = (grid, row, col) => {
     const newGrid = grid.slice();
     const node = newGrid[row][col];
