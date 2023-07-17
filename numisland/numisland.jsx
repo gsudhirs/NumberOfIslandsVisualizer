@@ -46,15 +46,23 @@ export default class numisland extends Component {
 
     animateDFS() {
         var orderVisited = this.state.orderVisited;
+        var islands = this.state.islands;
+        var newIsland = false;
         for (let i = 0; i < orderVisited.length; i++) {
             setTimeout(() => {
                 const node = orderVisited[i];
                 const {isIsland} = node;
                 if (isIsland) {
+                    if (!newIsland) {
+                        islands++;
+                        newIsland = true;
+                        this.setState({islands: islands});
+                    }
                     document.getElementById(`node-${node.row}-${node.col}`).className =
                   'node island-visited';
                 }
                 else {
+                    newIsland = false;
                     document.getElementById(`node-${node.row}-${node.col}`).className =
                   'node node-visited';
                 }
@@ -71,8 +79,8 @@ export default class numisland extends Component {
             for (let c = 0; c < GRID_COLS; c++) {
                 const {isIsland} = grid[r][c];
                 if (isIsland && !visited[r][c]) {
-                    islands++;
-                    this.setState({islands: islands});
+                    //islands++;
+                    //this.setState({islands: islands});
                     this.dfs(r, c);
                 }
                 else {
