@@ -65,7 +65,7 @@ export default class numisland extends Component {
     /**
      * animates path taken by the algorithm and discerns islands vs water
      */
-    animateDFS() {
+    animate() {
         var orderVisited = this.state.orderVisited;
         var islands = this.state.islands;
         var newIsland = false;
@@ -94,9 +94,8 @@ export default class numisland extends Component {
     /**
      * explores the grid and DFS on the first unvisited cell thats an island
      */
-    visualizeIslands() {
+    visualizeDFS() {
         var grid = this.state.grid;
-        var islands = this.state.islands;
         var visited = this.state.visited;
         var orderVisited = this.state.orderVisited;
         for (let r = 0; r < GRID_ROWS; r++) {
@@ -113,7 +112,7 @@ export default class numisland extends Component {
                 }
             }
         }
-        this.animateDFS();
+        this.animate();
     }
 
     /**
@@ -142,6 +141,57 @@ export default class numisland extends Component {
     }
 
     /**
+    * explores the grid and BFS on the first unvisited cell thats an island
+    */
+    visualizeBFS() {
+        var grid = this.state.grid;
+        var visited = this.state.visited;
+        var orderVisited = this.state.orderVisited;
+        for (let r = 0; r < GRID_ROWS; r++) {
+            for (let c = 0; c < GRID_COLS; c++) {
+                const {isIsland} = grid[r][c];
+                if (isIsland && !visited[r][c]) {
+                    this.bfs([[r, c]]);
+                }
+                else {
+                    if (visited[r][c])
+                        continue;
+                    orderVisited.push(grid[r][c]);
+                    this.setState({orderVisited: orderVisited});
+                }
+            }
+        }
+        this.animate();
+    }
+
+    /**
+     * helper method to bfs and detect a single island
+     * @param {*} row 
+     * @param {*} col 
+     * @returns 
+     */
+    bfs(queue){
+        var grid = this.state.grid;
+        var visited = this.state.visited;
+        var orderVisited = this.state.orderVisited;
+        const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+        while (queue.length > 0) {
+            let [row, col] = queue.shift();
+            if (row < 0 || row >= GRID_ROWS || col < 0 || col >= GRID_COLS || visited[row][col])
+                continue;
+            const {isIsland} = grid[row][col];
+            if (!isIsland)
+                continue;
+            visited[row][col] = true;
+            orderVisited.push(grid[row][col]);
+            this.setState({orderVisited: orderVisited});
+            for (let dir of DIRECTIONS) {
+                queue.push([row+dir[0], col+dir[1]]);
+            }
+        }
+    }
+
+    /**
      * clears all islands on the board
      */
     clearBoard() {
@@ -162,11 +212,14 @@ export default class numisland extends Component {
         const {grid, mouseIsPressed, islands} = this.state;
         return (
             <div>
-                <button onClick={() => this.visualizeIslands()}>
-                    Start!
+                <button onClick={() => this.visualizeDFS()}>
+                    Visualize DFS
+                </button>
+                <button onClick={() => this.visualizeBFS()}>
+                    Visualize BFS
                 </button>
                 <button onClick={() => this.clearBoard()}>
-                    Clear grid!
+                    Clear grid
                 </button>
                 <label>
                     Number of islands: {islands}
