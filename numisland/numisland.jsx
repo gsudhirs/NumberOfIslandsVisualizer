@@ -49,8 +49,15 @@ export default class numisland extends Component {
         for (let i = 0; i < orderVisited.length; i++) {
             setTimeout(() => {
                 const node = orderVisited[i];
-                document.getElementById(`node-${node.row}-${node.col}`).className =
+                const {isIsland} = node;
+                if (isIsland) {
+                    document.getElementById(`node-${node.row}-${node.col}`).className =
+                  'node island-visited';
+                }
+                else {
+                    document.getElementById(`node-${node.row}-${node.col}`).className =
                   'node node-visited';
+                }
             }, 10 * i);
         }
     }
@@ -64,8 +71,9 @@ export default class numisland extends Component {
             for (let c = 0; c < GRID_COLS; c++) {
                 const {isIsland} = grid[r][c];
                 if (isIsland && !visited[r][c]) {
-                    this.dfs(r, c);
                     islands++;
+                    this.setState({islands: islands});
+                    this.dfs(r, c);
                 }
                 else {
                     if (visited[r][c])
@@ -109,11 +117,12 @@ export default class numisland extends Component {
             grid: getInitGrid(),
             visited: getInitVisited(),
             orderVisited: [],
+            islands: 0,
         })
     }
 
     render() {
-        const {grid, mouseIsPressed} = this.state;
+        const {grid, mouseIsPressed, islands} = this.state;
         return (
             <div>
                 <button onClick={() => this.visualizeIslands()}>
@@ -122,6 +131,9 @@ export default class numisland extends Component {
                 <button onClick={() => this.clearBoard()}>
                     Clear grid!
                 </button>
+                <label>
+                    Number of islands: {islands}
+                </label>
                 <div className="grid">
                     {grid.map((row, rowIdx) => {
                         return (
