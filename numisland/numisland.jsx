@@ -71,14 +71,13 @@ export default class numisland extends Component {
                     if (visited[r][c])
                         continue;
                     orderVisited.push(grid[r][c]);
-                    this.setState({orderVisited: orderVisited, orderVisited: []});
+                    this.setState({orderVisited: orderVisited});
                 }
             }
         }
         console.log(islands);
         console.log(orderVisited);
         this.animateDFS();
-        this.setState({visited: getInitVisited()});
     }
 
     dfs(row, col){
@@ -100,6 +99,19 @@ export default class numisland extends Component {
         this.dfs(row, col+1);
     }
 
+    clearBoard() {
+        var orderVisited = this.state.orderVisited;
+        for (let i = 0; i < orderVisited.length; i++) {
+            const node = orderVisited[i];
+            document.getElementById(`node-${node.row}-${node.col}`).className = 'node node';
+        }
+        this.setState({
+            grid: getInitGrid(),
+            visited: getInitVisited(),
+            orderVisited: [],
+        })
+    }
+
     render() {
         const {grid, mouseIsPressed} = this.state;
         return (
@@ -107,7 +119,7 @@ export default class numisland extends Component {
                 <button onClick={() => this.visualizeIslands()}>
                     Start!
                 </button>
-                <button onClick={() => this.setState({grid: getInitGrid()})}>
+                <button onClick={() => this.clearBoard()}>
                     Clear grid!
                 </button>
                 <div className="grid">
