@@ -22,6 +22,7 @@ export default class numisland extends Component {
             visited: [],                    // 2D array representing whether search reached cell at i,j
             mouseIsPressed: false,          
             islands: 0,                     // current # of islands detected
+            largestIsland: 0,               // largest island currently detected
             orderVisited: [],               // order of cells visited by search
         };
         this.dfs=this.dfs.bind(this);
@@ -68,7 +69,9 @@ export default class numisland extends Component {
     animate() {
         var orderVisited = this.state.orderVisited;
         var islands = this.state.islands;
+        var largestIsland = this.state.largestIsland;
         var newIsland = false;
+        var size = 0;
         for (let i = 0; i < orderVisited.length; i++) {
             setTimeout(() => {
                 const node = orderVisited[i];
@@ -79,10 +82,17 @@ export default class numisland extends Component {
                         newIsland = true;
                         this.setState({islands: islands});
                     }
+                    size++;
                     document.getElementById(`node-${node.row}-${node.col}`).className =
                   'node island-visited';
                 }
                 else {
+                    if (newIsland && size > largestIsland) {
+                        console.log(largestIsland);
+                        this.setState({largestIsland: size});
+                        largestIsland = size;
+                        size = 0;
+                    }
                     newIsland = false;
                     document.getElementById(`node-${node.row}-${node.col}`).className =
                   'node node-visited';
@@ -205,11 +215,12 @@ export default class numisland extends Component {
             visited: getInitVisited(),
             orderVisited: [],
             islands: 0,
+            largestIsland: 0,
         })
     }
 
     render() {
-        const {grid, mouseIsPressed, islands} = this.state;
+        const {grid, mouseIsPressed, islands, largestIsland} = this.state;
         return (
             <div>
                 <button onClick={() => this.visualizeDFS()}>
@@ -223,6 +234,9 @@ export default class numisland extends Component {
                 </button>
                 <label>
                     Number of islands: {islands}
+                </label>
+                <label>
+                    &nbsp;, Largest island area: {largestIsland}
                 </label>
                 <div className="grid">
                     {grid.map((row, rowIdx) => {
